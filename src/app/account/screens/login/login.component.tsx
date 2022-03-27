@@ -8,13 +8,16 @@ import {
   TextField,
   Typography,
   CssBaseline,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import * as yup from "yup";
 import { Formik } from "formik";
-import { useState } from "react";
+import { isEqual } from "lodash";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 function Copyright(props: any) {
   return (
@@ -34,8 +37,13 @@ function Copyright(props: any) {
 }
 
 const loginFormInitialValues = {
-  email: "114514@qq.com",
-  password: "114514",
+  email: "",
+  password: "",
+};
+
+const adminIdAndPassword = {
+  email: "admin@example.com",
+  password: "123456",
 };
 
 const loginFormValidationSchema = yup.object({
@@ -53,18 +61,30 @@ export function Login() {
   const theme = createTheme();
   const navigate = useNavigate();
 
-  const [loginFormValues, setLoginFormValues] = useState(
-    loginFormInitialValues
-  );
+  const [openPasswordIncorrectAlert, setOpenPasswordIncorrectAlert] =
+    useState(false);
 
   function onSubmit(values: typeof loginFormInitialValues) {
-    setLoginFormValues(values);
-    navigate("/dashboard");
+    if (isEqual(values, adminIdAndPassword)) {
+      setTimeout(() => navigate("/dashboard"), 1000);
+    } else {
+      setOpenPasswordIncorrectAlert(true);
+    }
   }
 
   return (
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ height: "100vh" }}>
+        <Snackbar
+          open={openPasswordIncorrectAlert}
+          autoHideDuration={5000}
+          sx={{ width: "97%" }}
+          onClose={() => setOpenPasswordIncorrectAlert(false)}
+        >
+          <Alert severity="error" sx={{ width: "100%" }}>
+            The Id and password you entered is incorrect.
+          </Alert>
+        </Snackbar>
         <CssBaseline />
         <Grid
           item
